@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  container1:
+    build:
+      context: .
+      dockerfile: ./todoList/Dockerfile
+    ports: 
+      - 4000:8080
+      
