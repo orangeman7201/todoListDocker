@@ -14,11 +14,11 @@
       </thead>
 
       <thead>
-        <tr v-for="todo in showInputTodos" :key="todo.task">
+        <tr v-for="todo in showInputTodos" :key="todo.id">
           <td>{{todo.id}}</td>
           <td>{{todo.task}}</td>
           <td>
-            <button v-if="unshowInputTodos[todo.id].state === 'working'" @click="changeState(todo.id)">作業中</button>
+            <button v-if="InputTodos[todo.id].state === 'working'" @click="changeState(todo.id)">作業中</button>
             <button v-else @click="changeState(todo.id)">完了</button>
           </td>
           <td><button @click="deleteItem(todo.id); updateId()">削除</button></td>
@@ -42,42 +42,40 @@
       }
     },
     computed: {
-      unshowInputTodos:function() {
+      InputTodos() {
         return this.$store.getters.inputTodos;
       },
-      showInputTodos:function() {
-        const self = this;
-        if(self.radioState === 'all') {
-          return self.$store.getters.inputTodos;
-        } else if (self.radioState === "working") {
-          return self.$store.getters.inputTodos.filter(todo => todo.state === 'working' )
-        } else {
-          return self.$store.getters.inputTodos.filter(todo => todo.state === 'finish' )
-        } 
+      showInputTodos() {
+        return this.$store.getters.filteredTodos;
       },
     },
     methods: {
-      addTodo: function() {
+      addTodo() {
         const Item = {id: '',task: this.newTodo, state: 'working'}
-        this.unshowInputTodos.push(Item);
+        this.$store.dispatch('addTodo', Item)
         this.newTodo = '';
         this.updateId();
       },
-      deleteItem: function(index) {
-        this.unshowInputTodos.splice(index,1)
+      deleteItem(index) {
+        this.$store.dispatch('deleteItem', index)
       },
-      changeState: function(index) {
-        if (this.unshowInputTodos[index].state === 'working') {
-          this.unshowInputTodos[index].state = 'finish'
-        } else if (this.unshowInputTodos[index].state === 'finish') {
-          this.unshowInputTodos[index].state = 'working'
-        }
+      changeRadioState(index) {
+        this.$store.dispatch('changeRadioState', index)
       },
-      updateId: function() {
-        for(let idNum = 0; idNum < this.unshowInputTodos.length; idNum++) {
-          this.unshowInputTodos[idNum].id = idNum;
-        }
+      changeState(index) {
+        this.$store.dispatch('changeState', index)
+      },
+      updateId() {
+        this.$store.dispatch('updateId')
       },
     },
+    watch: {
+      radioState: {
+        handler() {
+          this.$store.dispatch('changeRadioState', this.radioState);
+        },
+        deep:true
+      }
+    }
   }
 </script>

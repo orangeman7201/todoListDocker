@@ -2,7 +2,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import TodoList from './components/TodoList.vue';
 import store from './store';
-import router from './router';
 
 
 
@@ -12,7 +11,6 @@ Vue.component('TodoList', TodoList);
 
 
 new Vue({
-  router,
   store,
   render: h => h(App),
 }).$mount('#app')

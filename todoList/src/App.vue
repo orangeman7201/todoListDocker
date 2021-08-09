@@ -1,9 +1,5 @@
 <template>
   <div>
-    <router-view></router-view>
+    <TodoList></TodoList>
   </div>
 </template>
-
-<style>
-@import "~bulma/css/bulma.css";
-</style>
