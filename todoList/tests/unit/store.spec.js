@@ -1,66 +1,51 @@
-import { shallowMount, createLocalVue } from "@vue/test-utils";
-import Vuex from "vuex";
-import TodoList from "../../src/components/TodoList";
 import store from "../../src/store";
 
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
+describe("store.js", () => {
 
-describe("TodoList.vue", () => {
-  let wrapper = shallowMount(TodoList, {store, localVue});
+  it('actionsのaddTodo起動すると、addTodoが保持しているデータがStateに保存されることを確認するテスト', function() {
+    //次のテストのため、あえてid: 1としている
+    store.dispatch('addTodo', {id: 1, task: '米を研ぐ', state: 'working'})
+    expect(store.state.todos.length).toBe(1)
+  });
 
-  it('入力されたデータのtaskプロパティがsubmit-buttonを押すと{{todo.task}}に出力されることを確認するテスト', function() {
-    wrapper.find("#input").setValue('米を研ぐ');
-    wrapper.find('#submit-button').trigger('submit');
-    wrapper.vm.$nextTick(() => { 
-      expect(wrapper.find('#display').exists()).toBe(true);
-      wrapper.find('#delete-button').trigger('click');
-    });
+
+  it('actionsのupdateId起動すると、stateが保持しているデータのidが1から0になることを確認するテスト', function() {
+    expect(store.state.todos[0].id).toBe(1)
+    store.dispatch('updateId')
+    expect(store.state.todos[0].id).toBe(0)
+  });
+
+
+  it('actionsのdeleteItemを起動すると、stateのtodosに保存されているデータが消えることを確認するテスト', function() {
+    expect(store.state.todos.length).toBe(1)
+    store.dispatch('deleteItem', 0)
+    expect(store.state.todos.length).toBe(0)
+  });
+
+
+  it('actionsのchangeStateを起動すると、todosに保存されているデータのstateがworkingからfinishになることを確認するテスト', function() {
+    ///state.todosにデータを持たせる処理
+    store.dispatch('addTodo', {id: 0, task: '米を研ぐ', state: 'working'})
+    ///以下テスト
+    expect(store.state.todos[0].state).toBe('working')
+    store.dispatch('changeState', 0)
+    expect(store.state.todos[0].state).toBe('finish')
+  });
+
+
+  it('actionsのchangeRadioStateに"working"や"finish"を持たせて起動すると、radioStateがそれぞれに変更され、gettersのfilteredTodosがradiosStateに応じたTodosを返すことを確認するテスト', function() {
+    ///state.todosに2つ目のデータを持たせる処理
+    store.dispatch('addTodo', {id: 0, task: '米を炊く', state: 'working'})
+    ///以下テスト
+    store.dispatch('changeRadioState','working')
+    expect(store.getters.filteredTodos[0].task).toBe('米を炊く')
+    store.dispatch('changeRadioState','finish')
+    expect(store.getters.filteredTodos[0].task).toBe('米を研ぐ')
   });
   
-  it('delete-buttonを押したとき{{todo.task}}の出力が消えることを確認するテスト', function() {
-    ///storeのstate.todosにデータを持たせるため、#inputにデータを入力しsubmitを行う
-    wrapper.find("#input").setValue('米を買う');
-    wrapper.find('#submit-button').trigger('submit');
-
-    ///以下テスト
-    wrapper.vm.$nextTick(() => {
-      expect(wrapper.find('#display').exists()).toBe(true);
-      wrapper.find('#delete-button').trigger('click');
-      wrapper.vm.$nextTick(() => { 
-      expect(wrapper.find('#display').exists()).toBe(false);
-      });
-    });
-  });
-
-  it('state-working-buttonを押すとstate-finish-buttonのが出力されることを確認するテスト', function() {
-    ///storeのstate.todosにデータを持たせるため、#inputにデータを入力しsubmitを行う
-    wrapper.find("#input").setValue('米を食べる');
-    wrapper.find('#submit-button').trigger('submit');
-
-    ///以下テスト
-    wrapper.vm.$nextTick(() => {
-      expect(wrapper.find('#state-working-button').text()).toBe('作業中');
-      wrapper.find('#state-working-button').trigger('click');
-      wrapper.vm.$nextTick(() => { 
-        expect(wrapper.find('#state-finish-button').text()).toBe('完了');
-        wrapper.find('#delete-button').trigger('click');
-      });
-    });
-  });
-
-  it('radioButtonを押すと{{todo.task}}に出力されていたものが消えることを確認するテスト', function() {
-    ///storeのstate.todosにデータを持たせるため、#inputにデータを入力しsubmitを行う
-    wrapper.find("#input").setValue('米を炊く');
-    wrapper.find('#submit-button').trigger('submit');
-    ///以下テスト
-    wrapper.vm.$nextTick(() => {
-    expect(wrapper.find('#display').exists()).toBe(true);
-    wrapper.find('#finish').trigger('click');
-    wrapper.vm.$nextTick(() => { 
-        expect(wrapper.find('#display').exists()).toBe(false);
-      })
-    })
+  
+  it('gettersのinputTodosのlengthが2であることを確認するテスト', function() {
+    expect(store.getters.inputTodos.length).toBe(2)
   });
 });
