@@ -34,18 +34,30 @@ describe("store.js", () => {
   });
 
 
-  it('actionsのchangeRadioStateに"working"や"finish"を持たせて起動すると、radioStateがそれぞれに変更され、gettersのfilteredTodosがradiosStateに応じたTodosを返すことを確認するテスト', function() {
-    ///state.todosに2つ目のデータを持たせる処理
-    store.dispatch('addTodo', {id: 0, task: '米を炊く', state: 'working'})
-    ///以下テスト
+  it('actionsのchangeRadioStateに"working"や"finish"を持たせて起動すると、radioStateがそれぞれに変更されることを確認するテスト', function() {
     store.dispatch('changeRadioState','working')
-    expect(store.getters.filteredTodos[0].task).toBe('米を炊く')
+    expect(store.state.radioState).toBe('working')
     store.dispatch('changeRadioState','finish')
-    expect(store.getters.filteredTodos[0].task).toBe('米を研ぐ')
+    expect(store.state.radioState).toBe('finish')
   });
   
   
   it('gettersのinputTodosのlengthが2であることを確認するテスト', function() {
+    ///state.todosに2つ目のデータを持たせる処理
+    store.dispatch('addTodo', {id: 0, task: '米を炊く', state: 'working'})
+    ///以下テスト
     expect(store.getters.inputTodos.length).toBe(2)
+  });
+
+
+  it('radiostateが"finish","working","all"となったとき、gettersのfilteredTodosのlengthがそれぞれ1,1,2となることを確認するテスト', function() {
+    ///1つ目のテスト(radiostate === 'finish')
+    expect(store.getters.filteredTodos.length).toBe(1)
+    ///2つ目のテスト(radiostate === 'working')
+    store.dispatch('changeRadioState','working')
+    expect(store.getters.filteredTodos.length).toBe(1)
+    ///3つ目のテスト(radiostate === 'all')
+    store.dispatch('changeRadioState','all')
+    expect(store.getters.filteredTodos.length).toBe(2)
   });
 });
