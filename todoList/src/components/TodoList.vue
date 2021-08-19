@@ -13,22 +13,22 @@
       </tr>
       </thead>
 
-      <thead>
+      <thead id="buttonThead">
         <tr v-for="todo in showInputTodos" :key="todo.id">
-          <td>{{todo.id}}</td>
-          <td>{{todo.task}}</td>
+          <td >{{todo.id}}</td>
+          <td id="display">{{todo.task}}</td>
           <td>
-            <button v-if="InputTodos[todo.id].state === 'working'" @click="changeState(todo.id)">作業中</button>
-            <button v-else @click="changeState(todo.id)">完了</button>
+            <button id='state-working-button' v-if="InputTodos[todo.id].state === 'working'" @click="changeState(todo.id)">作業中</button>
+            <button id='state-finish-button' v-else @click="changeState(todo.id)">完了</button>
           </td>
-          <td><button @click="deleteItem(todo.id); updateId()">削除</button></td>
+          <td><button id="delete-button" @click="deleteItem(todo.id); updateId()">削除</button></td>
         </tr>
       </thead>
     </table>
 
     <form @submit.prevent="addTodo">
-      <input type="text" v-model="newTodo">
-      <input type="submit" value="追加">
+      <input id="input" type="text" v-model="newTodo">
+      <input id="submit-button" type="submit" value="追加">
     </form>
   </div>
 </template>
